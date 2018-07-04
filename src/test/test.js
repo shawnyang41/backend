@@ -28,26 +28,27 @@ function test3(){
         "Latitude" : "444"
         }
     ).end((err, res) => {
-        if (res.status == 200) console.log('test3 passed');
+        if (res.status == 200){
+            console.log('test3 passed');
+            superagent.post('localhost:3000/createDevice').send(
+                {
+                "DeviceID" : 119,
+                "DeviceName" : "Shawn's iphone",
+                "BatteryStatus" : "100",
+                "Longitude" : "12",
+                "Latitude" : "444"
+                }
+            ).end((err, res) => {
+                if (res.status == 400) console.log('test4 passed');
+                else console.log('test4 failed');
+            });
+        }
         if (err) console.log('test3 failed');
+
     })
 }
 
-function test4(){
-    //POST duplicated data
-    superagent.post('localhost:3000/createDevice').send(
-        {
-        "DeviceID" : 119,
-        "DeviceName" : "Shawn's iphone",
-        "BatteryStatus" : "100",
-        "Longitude" : "12",
-        "Latitude" : "444"
-        }
-    ).end((err, res) => {
-        if (res.status == 400) console.log('test4 passed');
-        else console.log('test4 failed');
-    })
-}
+
 
 function test5(){
     //testing data lookup
@@ -59,7 +60,12 @@ function test5(){
         "Longitude" : "12",
         "Latitude" : "444"
         }
-    ).end((err, res) => {});
+    ).end((err, res) => {
+        superagent.get('localhost:3000/deviceLookup').query({id: 1}).end((err, res)=> {
+            if(res.body.DeviceID == 1 && res.body.DeviceName == "first") console.log('test5-3 passed');
+            else console.log('test5-3 failed');
+        });
+    });
     superagent.post('localhost:3000/createDevice').send(
         {
         "DeviceID" : 2,
@@ -68,7 +74,13 @@ function test5(){
         "Longitude" : "12",
         "Latitude" : "444"
         }
-    ).end((err, res) => {});
+    ).end((err, res) => {
+        superagent.get('localhost:3000/deviceLookup').query({id: 2}).end((err, res)=> {
+            if(res.body.DeviceID == 2 && res.body.DeviceName == "second") console.log('test5-2 passed');
+            else console.log('test5-2 failed');
+            
+        });
+    });
     superagent.post('localhost:3000/createDevice').send(
         {
         "DeviceID" : 3,
@@ -77,28 +89,18 @@ function test5(){
         "Longitude" : "12",
         "Latitude" : "444"
         }
-    ).end((err, res) => {});
+    ).end((err, res) => {    
+        superagent.get('localhost:3000/deviceLookup').query({id: 3}).end((err, res)=> {
+            if(res.body.DeviceID == 3 && res.body.DeviceName == "third") console.log('test5-1 passed');
+            else console.log('test5-1 failed');
+        });
+    });
 
-    
-    superagent.get('localhost:3000/deviceLookup').query({id: 3}).end((err, res)=> {
-        if(res.body.DeviceID == 3 && res.body.DeviceName == "third") console.log('test5-1 passed');
-        else console.log('test5-1 failed');
-        
-    });
-    superagent.get('localhost:3000/deviceLookup').query({id: 2}).end((err, res)=> {
-        if(res.body.DeviceID == 2 && res.body.DeviceName == "second") console.log('test5-2 passed');
-        else console.log('test5-2 failed');
-        
-    });
-    superagent.get('localhost:3000/deviceLookup').query({id: 1}).end((err, res)=> {
-        if(res.body.DeviceID == 1 && res.body.DeviceName == "first") console.log('test5-3 passed');
-        else console.log('test5-3 failed');
-        
-    });
+
+
 }
 
 test1();
 test2();
 test3();
-test4();
 test5();
